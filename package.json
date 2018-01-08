@@ -1,6 +1,6 @@
 {
   "name": "web3js-raw",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "web3js wrapper to work with minimum dependencies",
   "main": "index.js",
   "scripts": {
