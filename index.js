@@ -5,6 +5,8 @@ Reusable set of functions to send transactions using sendRawTransaction of web3j
  * MIT Licensed
 */
 
+'use strict'
+
 var Web3 = require('web3'); // https://www.npmjs.com/package/web3
 var Web3Utils = require('web3-utils');
 var Web3EthAccounts = require('web3-eth-accounts');
