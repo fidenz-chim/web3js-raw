@@ -98,5 +98,5 @@ Refer [Fund Splitter smart contract dapp](https://github.com/fidenz-chim/fund_sp
             data: '0x00',
             gasLimit: '0x00',
             gasPrice: '0x00'
-        };
-        ```
+        };```
+        
