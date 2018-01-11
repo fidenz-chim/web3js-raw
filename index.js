@@ -84,7 +84,7 @@ module.exports = function (){
 
     this.invokeGetTxnReceipt = async function (tx_hash, callback){
         var e = await web3.eth.getTransaction(tx_hash);
-        callback({"status":1,"functionName":functionName,"message":e});
+        callback({"status":1,"invokeGetTxnReceipt":"invokeGetTxnReceipt","message":e});
     }
 
     this.getDefaultTxnAttributes = function (nonce,fromAddress, toAddress, valueInEther,dataAsHex, gasLimit, gasPrice){
