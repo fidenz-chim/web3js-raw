@@ -15,18 +15,31 @@ or
 
 * _setProvider_ - set HTTP provider 
   * in params
-    * provider [https://ropsten.infura.io/<token>]
-  * out parama
+    * provider [https://ropsten.infura.io/__token__]
+  * out params
     * <none>
 * _createContractInstance_ - create an interface instance for an already deployed contract
   * in params
-    * contract ABI [https://ropsten.infura.io/<token>]
-    * contract Address []
-  * out parama
+    * contractABI - ABI of the contract
+    * contractAddress - current address of the contract
+  * out params
     * <none>
   
 * _getTransactionData_ - prepare data payload of a method adding parameters
+  * in params
+    * functionName - Name of the function to invoke  []
+    * types - array of parameter data types  [uint,address]
+    * args - array of parameter values  [8, '0x001a18EaFA0b300247Be05ECE41DE8d78c7B0620']    
+  * out params
+    * value for _data_ of transaction message as hex (prefixed with 0x)
+
 * _encodeConstructorParams_ - prepare data payload of constructor method adding parameters
+  * in params
+    * abi - contract ABI 
+    * params - array of parameter values  [8, '0x001a18EaFA0b300247Be05ECE41DE8d78c7B0620']    
+  * out params
+    * value for _data_ of transaction message as hex (prefixed with 0x)
+
 * _getSignedTransaction_ - sign the transaction data with given private key
 * _createNewAccount_ - create a new account in network
 * _invokeSendRawTransaction_ - send the signed transaction to network
