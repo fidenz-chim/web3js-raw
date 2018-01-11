@@ -17,13 +17,13 @@ or
   * in params
     * provider [https://ropsten.infura.io/__token__]
   * out params
-    * <none>
+    * __none__
 * _createContractInstance_ - create an interface instance for an already deployed contract
   * in params
     * contractABI - ABI of the contract
     * contractAddress - current address of the contract
   * out params
-    * <none>
+    * __none__
   
 * _getTransactionData_ - prepare data payload of a method adding parameters
   * in params
@@ -41,8 +41,52 @@ or
     * value for _data_ of transaction message as hex (prefixed with 0x)
 
 * _getSignedTransaction_ - sign the transaction data with given private key
-* _createNewAccount_ - create a new account in network
-* _invokeSendRawTransaction_ - send the signed transaction to network
-* _invokeGetTxnReceipt_ - retreive the transaction receipt from a transaction hash
-* _getDefaultTxnAttributes_ - get the transaction message with default values (or provide custom values)
+  * in params
+    * txnRawData - output from _getTransactionData_ or _encodeConstructorParams_
+    * pvtKey - private key of the account with Ether  
+  * out params
+    * signed message as hex (prefixed with 0x)
 
+* _createNewAccount_ - create a new account in network
+  * in params
+    * callback function which accept one parameter (JSON object)
+  * out params
+    * address - newly created account address
+    * privateKey - private key of newly created account
+
+* _invokeSendRawTransaction_ - send the signed transaction to network
+  * in params
+    * functionName - name of the function to invoke - only to use in callback function to identify the response
+    * transactionPayload - signed data return by _getSignedTransaction_
+    * callback function which accept one parameter (JSON object)
+  * out params
+    * __none__ / invoke callback function which accept one parameter (JSON object)
+
+* _invokeGetTxnReceipt_ - retreive the transaction receipt from a transaction hash
+  * in params
+    * tx_hash - hash of the transaction to get receipt
+    * callback function which accept one parameter (JSON object)
+  * out params
+    * __none__ / invoke callback function which accept one parameter (JSON object)
+
+* _getDefaultTxnAttributes_ - get the transaction message with default values (or provide custom values)
+  * in params
+    * nonce 
+    * fromAddress 
+    * toAddress
+    * valueInEther 
+    * dataAsHex
+    * gasLimit
+    * gasPrice
+  * out params
+    * ```
+            var TxnAttributes = {
+            nonce: '0x00',
+            from: '0x00',
+            to: '0x00',
+            value: '0x00',
+            data: '0x00',
+            gasLimit: '0x00',
+            gasPrice: '0x00'
+        };
+        ```
