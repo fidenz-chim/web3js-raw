@@ -13,19 +13,19 @@ or
 
 ## List of functions ##
 
-* _setProvider_ - set HTTP provider 
+* __setProvider__ - set HTTP provider 
   * in params
     * provider [https://ropsten.infura.io/__token__]
   * out params
     * __none__
-* _createContractInstance_ - create an interface instance for an already deployed contract
+* __createContractInstance__ - create an interface instance for an already deployed contract
   * in params
     * contractABI - ABI of the contract
     * contractAddress - current address of the contract
   * out params
     * __none__
   
-* _getTransactionData_ - prepare data payload of a method adding parameters
+* __getTransactionData__ - prepare data payload of a method adding parameters
   * in params
     * functionName - Name of the function to invoke  []
     * types - array of parameter data types  [uint,address]
@@ -33,28 +33,28 @@ or
   * out params
     * value for _data_ of transaction message as hex (prefixed with 0x)
 
-* _encodeConstructorParams_ - prepare data payload of constructor method adding parameters
+* __encodeConstructorParams__ - prepare data payload of constructor method adding parameters
   * in params
     * abi - contract ABI 
     * params - array of parameter values  [8, '0x001a18EaFA0b300247Be05ECE41DE8d78c7B0620']    
   * out params
     * value for _data_ of transaction message as hex (prefixed with 0x)
 
-* _getSignedTransaction_ - sign the transaction data with given private key
+* __getSignedTransaction__ - sign the transaction data with given private key
   * in params
     * txnRawData - output from _getTransactionData_ or _encodeConstructorParams_
     * pvtKey - private key of the account with Ether  
   * out params
     * signed message as hex (prefixed with 0x)
 
-* _createNewAccount_ - create a new account in network
+* __createNewAccount__ - create a new account in network
   * in params
     * callback function which accept one parameter (JSON object)
   * out params
     * address - newly created account address
     * privateKey - private key of newly created account
 
-* _invokeSendRawTransaction_ - send the signed transaction to network
+* __invokeSendRawTransaction__ - send the signed transaction to network
   * in params
     * functionName - name of the function to invoke - only to use in callback function to identify the response
     * transactionPayload - signed data return by _getSignedTransaction_
@@ -62,14 +62,14 @@ or
   * out params
     * __none__ / invoke callback function which accept one parameter (JSON object)
 
-* _invokeGetTxnReceipt_ - retreive the transaction receipt from a transaction hash
+* __invokeGetTxnReceipt__ - retreive the transaction receipt from a transaction hash
   * in params
     * tx_hash - hash of the transaction to get receipt
     * callback function which accept one parameter (JSON object)
   * out params
     * __none__ / invoke callback function which accept one parameter (JSON object)
 
-* _getDefaultTxnAttributes_ - get the transaction message with default values (or provide custom values)
+* __getDefaultTxnAttributes__ - get the transaction message with default values (or provide custom values)
   * in params
     * nonce 
     * fromAddress 
