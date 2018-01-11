@@ -88,7 +88,8 @@ Refer [Fund Splitter smart contract dapp](https://github.com/fidenz-chim/fund_sp
     * gasLimit
     * gasPrice
   * out params
-    * ```
+    * Following structure filled with necessary values
+    ```
             var TxnAttributes = {
             nonce: '0x00',
             from: '0x00',
