@@ -11,6 +11,15 @@ or
 * Account with Ether balance (to deploy the contract)
 * Private key of the contract 
 
+## Install ##
+```
+npm install web3js-raw
+```
+
+## Testing web3js-raw ##
+
+Refer [Fund Splitter smart contract dapp](https://github.com/fidenz-chim/fund_splitter.git) for sample contract, dapp and usage 
+
 ## List of functions ##
 
 * __setProvider__ - set HTTP provider 
