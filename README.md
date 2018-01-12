@@ -33,7 +33,7 @@ var web3jsrCallaback = function (data){
 
 ```
 There are __three__ main usage scenarios to interact with a smart contract using this package,
-* invoke a method __DOES NOT__ change the state of the contract
+#### invoke a method __DOES NOT__ change the state of the contract ####
 ```
 //.sol
     function getMemberAt(uint index) public view returns(address mem)
@@ -51,7 +51,7 @@ There are __three__ main usage scenarios to interact with a smart contract using
             console.error(error);
     });
 ```
-* invoke a method __DOES__ change the state of the contract
+#### invoke a method __DOES__ change the state of the contract ####
 ```
 //.sol
     function addMember(address newMember) payable public
@@ -70,7 +70,7 @@ There are __three__ main usage scenarios to interact with a smart contract using
     W3JSR.invokeSendRawTransaction(functionName,serializedTx,web3jsrCallaback);
 ```
 
-* deploy a contract 
+#### deploy a contract ####
 ```
 //.js
     var txnRawData = W3JSR.getDefaultTxnAttributes('',contractOwner,'','0',CONTRACT_CODE,'',10000000000);
