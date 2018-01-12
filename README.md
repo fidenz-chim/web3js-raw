@@ -10,7 +10,7 @@ Refer [Fund Splitter smart contract dapp (fundsplitter_web3jsraw)](https://githu
 
 * ABI of the contract
 * Account with Ether balance (to deploy the contract)
-* Private key of the contract
+* Private key of the account
 * Address of the contract (if you want to interact with already deployed contract)
 or
 * Byte code of the contract (if you want to deploy a new contract)
