@@ -84,9 +84,9 @@ There are __three__ main usage scenarios to interact with a smart contract using
 ```
 
 
-## Testing web3js-raw ##
+## Sample Dapp using web3js-raw ##
 
-Refer [Fund Splitter smart contract dapp](https://github.com/fidenz-chim/fund_splitter.git) for sample contract, dapp and usage 
+Refer [Fund Splitter smart contract dapp](https://github.com/fidenz-chim/fund_splitter.git) for full implementation of a Dapp using web3js-raw
 
 ## List of functions ##
 
@@ -102,9 +102,9 @@ Refer [Fund Splitter smart contract dapp](https://github.com/fidenz-chim/fund_sp
   * out params
     * __none__
   
-* __getTransactionData__ - prepare data payload of a method adding parameters
+* __encodeFunctionParams__ - prepare data payload of a method adding parameters
   * in params
-    * functionName - Name of the function to invoke  []
+    * functionName - Name of the function to invoke
     * types - array of parameter data types  [uint,address]
     * args - array of parameter values  [8, '0x001a18EaFA0b300247Be05ECE41DE8d78c7B0620']    
   * out params
