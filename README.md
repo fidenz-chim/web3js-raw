@@ -1,6 +1,6 @@
 # web3js-raw #
 Set of functions which eleminates all additional dependencies from invoking a menthod in Ethereum platform.
-This uses sendRawTransaction method post transaction but encapsulate all tedeous data preparations and data sigining. Only downside is, you have to provide the private key of the account you interact with the smart contract. Following documentation assumes you will interact with Ropsten test net via infura.io, but module should work with any implementation of Ethereum network.
+This uses __sendRawTransaction__ method to post transactions but encapsulate all tedeous data preparations and data sigining tasks. Only downside is, having to provide the private key of the account which interacts with the smart contract. Following documentation assumes you will interact with Ropsten test net via infura.io, but module should work with any implementation of Ethereum network.
 
 ## Prerequisite ##
 
