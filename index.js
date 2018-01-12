@@ -31,7 +31,7 @@ module.exports = function (){
         this.ContractInstance = _contract.at(contractAddress);
     }
 
-    this.getTransactionData = function(methodName, types, args){
+    this.encodeFunctionParams = function(methodName, types, args){
         var fullName = methodName +  '(' + types.join() + ')';
 
         var signature = CryptoJS.SHA3(fullName,{outputLength:256}).toString(CryptoJS.enc.Hex).slice(0, 8);
