@@ -1,20 +1,88 @@
 # web3js-raw #
 Set of functions which eleminates all additional dependencies from invoking a menthod in Ethereum platform.
-This uses sendRawTransaction method post transaction but encapsulate all tedeous data preparations and data sigining. Only downside is, you have to provide the private key of the account you interact with the smart contract.
+This uses sendRawTransaction method post transaction but encapsulate all tedeous data preparations and data sigining. Only downside is, you have to provide the private key of the account you interact with the smart contract. Following documentation assumes you will interact with Ropsten test net via infura.io, but module should work with any implementation of Ethereum network.
 
 ## Prerequisite ##
 
 * ABI of the contract
+* Account with Ether balance (to deploy the contract)
+* Private key of the contract
 * Address of the contract (if you want to interact with already deployed contract)
 or
 * Byte code of the contract (if you want to deploy a new contract)
-* Account with Ether balance (to deploy the contract)
-* Private key of the contract 
 
 ## Install ##
 ```
-npm install web3js-raw
+npm install web3js-raw --save
 ```
+
+## Use cases ##
+Instantiate the package and then a contract
+```
+var _web3jsraw = require('web3js-raw');
+var W3JSR = new _web3jsraw();
+W3JSR.setProvider('https://ropsten.infura.io/{your_infura.io_token'});
+W3JSR.createContractInstance(CONTRACT_ABI,contractAddress); //Assuming the contract is already deployed to ropsten testnet
+```
+
+Define a callback function 
+```
+var web3jsrCallaback = function (data){
+    console.log("web3jsrCallaback - ", data);
+}
+
+```
+There are __three__ main usage scenarios to interact with a smart contract using this package,
+* invoke a method __DOES NOT__ change the state of the contract
+```
+//.sol
+    function getMemberAt(uint index) public view returns(address mem)
+```
+
+```
+//.js
+    W3JSR.ContractInstance.getMemberAt(index,function(error, result){
+        if(!error){
+            console.log("getMemberAt - ", result);
+            var str= "MemberAt - ".concat(result);
+            console.log(str);
+        }
+        else
+            console.error(error);
+    });
+```
+* invoke a method __DOES__ change the state of the contract
+```
+//.sol
+    function addMember(address newMember) payable public
+```
+
+```
+//.js
+    var functionName = 'addMember';
+    var types = ['address'];
+    var args = ['0x00002d5cc95777ed0f1dbcac9b5a30fb1868eea4'];
+
+    var txnData = W3JSR.encodeFunctionParams(functionName, types, args);
+    var txnRawData = W3JSR.getDefaultTxnAttributes('',contractOwner,CONTRACT_ADDRESS,'0',txnData,'','')
+    var serializedTx = W3JSR.getSignedTransaction(txnRawData, privateKey);
+
+    W3JSR.invokeSendRawTransaction(functionName,serializedTx,web3jsrCallaback);
+```
+
+* deploy a contract 
+```
+//.js
+    var txnRawData = W3JSR.getDefaultTxnAttributes('',contractOwner,'','0',CONTRACT_CODE,'',10000000000);
+
+    var args = [];
+    var bytes = W3JSR.encodeConstructorParams(CONTRACT_ABI, args);
+    txnRawData.data += bytes;
+
+    var serializedTx = W3JSR.getSignedTransaction(txnRawData, privateKey);
+    W3JSR.invokeSendRawTransaction("DeployContract",serializedTx,web3jsrCallaback );
+```
+
 
 ## Testing web3js-raw ##
 
