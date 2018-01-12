@@ -2,6 +2,10 @@
 Set of functions which eleminates all additional dependencies from invoking a menthod in Ethereum platform.
 This uses __sendRawTransaction__ method to post transactions but encapsulate all tedeous data preparations and data sigining tasks. Only downside is, having to provide the private key of the account which interacts with the smart contract. Following documentation assumes you will interact with Ropsten test net via infura.io, but module should work with any implementation of Ethereum network.
 
+## Sample Dapp using web3js-raw ##
+
+Refer [Fund Splitter smart contract dapp (fundsplitter_web3jsraw)](https://github.com/fidenz-chim/fundsplitter_web3jsraw.git) for fully funcational implementation of a Dapp using web3js-raw
+
 ## Prerequisite ##
 
 * ABI of the contract
@@ -82,11 +86,6 @@ There are __THREE__ main usage scenarios to interact with a smart contract using
     var serializedTx = W3JSR.getSignedTransaction(txnRawData, privateKey);
     W3JSR.invokeSendRawTransaction("DeployContract",serializedTx,web3jsrCallaback );
 ```
-
-
-## Sample Dapp using web3js-raw ##
-
-Refer [Fund Splitter smart contract dapp](https://github.com/fidenz-chim/fund_splitter.git) for full implementation of a Dapp using web3js-raw
 
 ## List of functions ##
 
