@@ -25,6 +25,10 @@ module.exports = function (){
         web3.setProvider(new web3.providers.HttpProvider(provider));
     }
 
+    this.getWeb3 = function (){
+        return web3;
+    }
+
     this.createContractInstance = function (contractABI,contractAddress){
         var _contract = web3.eth.contract(contractABI);
         this.ContractInstance = _contract.at(contractAddress);
@@ -39,6 +43,27 @@ module.exports = function (){
 
         return payload;
     }
+
+    this.encodeFunctionParamsEx = function(abi,methodName, types1, args){
+        var types = this.getFunctionParams(abi,methodName);
+        var fullName = methodName +  '(' + types.join() + ')';
+        var signature = CryptoJS.SHA3(fullName,{outputLength:256}).toString(CryptoJS.enc.Hex).slice(0, 8);
+        var dataHex = signature  + coder.encodeParams(...types, args);
+        var payload = '0x'+dataHex;
+
+        return payload;
+    }
+
+    this.getFunctionParams = function(abi, funcName) {
+        return abi.filter(function (json) {
+            return json.type === "function" && json.name === funcName;
+        }).map(function (json) {
+            return json.inputs.map(function (input) {
+                return input.type;
+            });
+        });
+    }
+
 
     this.encodeConstructorParams = function (abi, params) {
         return abi.filter(function (json) {
