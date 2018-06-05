@@ -34,21 +34,11 @@ module.exports = function (){
         this.ContractInstance = _contract.at(contractAddress);
     }
 
-    this.encodeFunctionParams = function(methodName, types, args){
-        var fullName = methodName +  '(' + types.join() + ')';
-
-        var signature = CryptoJS.SHA3(fullName,{outputLength:256}).toString(CryptoJS.enc.Hex).slice(0, 8);
-        var dataHex = signature  + coder.encodeParams(types, args);
-        var payload = '0x'+dataHex;
-
-        return payload;
-    }
-
-    this.encodeFunctionParamsEx = function(abi,methodName, types1, args){
+    this.encodeFunctionParams = function(abi,methodName, params){
         var types = this.getFunctionParams(abi,methodName);
         var fullName = methodName +  '(' + types.join() + ')';
         var signature = CryptoJS.SHA3(fullName,{outputLength:256}).toString(CryptoJS.enc.Hex).slice(0, 8);
-        var dataHex = signature  + coder.encodeParams(...types, args);
+        var dataHex = signature  + coder.encodeParams(...types, params);
         var payload = '0x'+dataHex;
 
         return payload;
@@ -63,7 +53,6 @@ module.exports = function (){
             });
         });
     }
-
 
     this.encodeConstructorParams = function (abi, params) {
         return abi.filter(function (json) {
@@ -85,23 +74,21 @@ module.exports = function (){
         return serializedTx;
     }
 
-    this.createNewAccountEx =  function() {
-
+    this.createNewAccount =  function() {
         return new Promise(function(resolve, reject) {
-        var accounts = new Web3EthAccounts();
-        var retObj =  accounts.create();
-        if (retObj === null) {
-            reject({"status":0,"message":"Account create failed"});
-        }
-        else {
-            console.log(retObj);
-            resolve({"address":retObj.address,"privateKey":retObj.privateKey});
-        }
-
+            var accounts = new Web3EthAccounts();
+            var retObj =  accounts.create();
+            if (retObj === null) {
+                reject({"status":0,"message":"Account create failed"});
+            }
+            else {
+                console.log(retObj);
+                resolve({"address":retObj.address,"privateKey":retObj.privateKey});
+            }
         });
     }
 
-    this.invokeSendRawTransactionEx = function (functionName, transactionPayload){
+    this.invokeSendRawTransaction = function (functionName, transactionPayload){
         return new Promise((resolve, reject) =>{
             web3.eth.sendRawTransaction(transactionPayload, function(error, txHash) {
                 if(!error){
@@ -114,7 +101,7 @@ module.exports = function (){
         });
     }
 
-    this.invokeGetTxnReceiptEx = function (tx_hash){
+    this.invokeGetTxnReceipt = function (tx_hash){
         return new Promise((resolve, reject) => {
             var txnInfo = web3.eth.getTransaction(tx_hash);
             if (txnInfo === null) {
