@@ -16,7 +16,6 @@ var CryptoJS = require('crypto-js');
 
 var web3 = new Web3();
 
-
 //Support Functions
 module.exports = function (){
 
@@ -61,30 +60,45 @@ module.exports = function (){
         return serializedTx;
     }
 
-    this.createNewAccount = async function(callback) {
-        var retObj = await account.create();
-        var str = "Create Acc      : \n"
-          + "   hash         : " + retObj.address + "\n"
-          + "   private key  : " + retObj.privateKey;
-        console.log(str);
+    this.createNewAccountEx =  function() {
 
-        callback({"status":1,"functionName":"createNewAccount","message":retObj});
-    }
+        return new Promise(function(resolve, reject) {
+        var accounts = new Web3EthAccounts();
+        var retObj =  accounts.create();
+        if (retObj === null) {
+            reject({"status":0,"message":"Account create failed"});
+        }
+        else {
+            console.log(retObj);
+            resolve({"address":retObj.address,"privateKey":retObj.privateKey});
+        }
 
-    this.invokeSendRawTransaction = async function (functionName, transactionPayload, callback){
-        await web3.eth.sendRawTransaction(transactionPayload, function(error, txHash) {
-            if(!error){
-                callback({"status":1,"functionName":functionName,"message":txHash});
-            }
-            else{
-                callback({"status":0,"functionName":functionName,"message":error});
-            }
         });
     }
 
-    this.invokeGetTxnReceipt = async function (tx_hash, callback){
-        var e = await web3.eth.getTransaction(tx_hash);
-        callback({"status":1,"invokeGetTxnReceipt":"invokeGetTxnReceipt","message":e});
+    this.invokeSendRawTransactionEx = function (functionName, transactionPayload){
+        return new Promise((resolve, reject) =>{
+            web3.eth.sendRawTransaction(transactionPayload, function(error, txHash) {
+                if(!error){
+                    resolve({"status":1,"functionName":functionName,"message":txHash});
+                }
+                else{
+                    reject({"status":0,"functionName":functionName,"message":error});
+                }
+            });
+        });
+    }
+
+    this.invokeGetTxnReceiptEx = function (tx_hash){
+        return new Promise((resolve, reject) => {
+            var txnInfo = web3.eth.getTransaction(tx_hash);
+            if (txnInfo === null) {
+                reject({"status":0,"message":"Transaction not found"});
+            }
+            else {
+                resolve({"status":1,"message":txnInfo});
+            }
+        });
     }
 
     this.getDefaultTxnAttributes = function (nonce,fromAddress, toAddress, valueInEther,dataAsHex, gasLimit, gasPrice){
