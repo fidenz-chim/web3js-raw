@@ -3,6 +3,8 @@ web3js-raw
 Reusable set of functions to send transactions using sendRawTransaction of web3js
  * Copyright(c) 2018-2018 Chim Himidumage
  * MIT Licensed
+
+ 2018/06/13 - Introduced promises to all Async calls
 */
 
 'use strict'
@@ -97,6 +99,21 @@ module.exports = function (){
                 else{
                     reject({"status":0,"functionName":functionName,"message":error});
                 }
+            });
+        });
+    }
+
+    this.prepareSignSend = function(abi,contractAddress,functionName,senderAddress,privateKey, params){
+        return new Promise((resolve, reject) => {
+
+            var txnData = this.encodeFunctionParams(abi, functionName,  params);
+            var txnRawData = this.getDefaultTxnAttributes('',senderAddress,contractAddress,'0',txnData,'','')
+            var serializedTx = this.getSignedTransaction(txnRawData, privateKey);
+
+            this.invokeSendRawTransaction(functionName,serializedTx).then((result) =>{
+                resolve(result);
+            },(error) =>{
+                reject(error);
             });
         });
     }
