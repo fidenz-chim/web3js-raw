@@ -4,7 +4,7 @@
   "description": "web3js wrapper to work with minimum dependencies",
   "dependencies": {
     "ethereumjs-tx": "^1.3.3",
-    "web3": "^0.17.0-beta",
+    "web3": "^1.0.0-beta.34",
     "web3-eth-accounts": "^1.0.0-beta.27",
     "web3-utils": "^1.0.0-beta.26",
     "babel-core": "^6.26.0",
