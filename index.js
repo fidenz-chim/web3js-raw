@@ -5,6 +5,8 @@ Reusable set of functions to send transactions using sendRawTransaction of web3j
  * MIT Licensed
 
  2018/06/13 - Introduced promises to all Async calls
+            - Updated all dependencies to latest versions
+            - Used <new web3.eth.Contract> for contract instance creation
 */
 
 'use strict'
@@ -13,7 +15,7 @@ var Web3 = require('web3'); // https://www.npmjs.com/package/web3
 var Web3Utils = require('web3-utils');
 var Web3EthAccounts = require('web3-eth-accounts');
 var Tx = require('ethereumjs-tx');
-var coder = require('web3/lib/solidity/coder');
+var Web3EthAbi = require('web3-eth-abi');
 var CryptoJS = require('crypto-js');
 
 var web3 = new Web3();
@@ -32,15 +34,16 @@ module.exports = function (){
     }
 
     this.createContractInstance = function (contractABI,contractAddress){
-        var _contract = web3.eth.contract(contractABI);
-        this.ContractInstance = _contract.at(contractAddress);
+        this.ContractInstance = new web3.eth.Contract(contractABI,contractAddress);
     }
 
     this.encodeFunctionParams = function(abi,methodName, params){
         var types = this.getFunctionParams(abi,methodName);
         var fullName = methodName +  '(' + types.join() + ')';
         var signature = CryptoJS.SHA3(fullName,{outputLength:256}).toString(CryptoJS.enc.Hex).slice(0, 8);
-        var dataHex = signature  + coder.encodeParams(...types, params);
+        var dataHex = signature  + Web3EthAbi.encodeParams(...types, params);
+        console.log("encodeFunctionParams - Web3EthAbi");
+
         var payload = '0x'+dataHex;
 
         return payload;
@@ -64,7 +67,10 @@ module.exports = function (){
                 return input.type;
             });
         }).map(function (types) {
-            return coder.encodeParams(types, params);
+            // return coder.encodeParams(types, params);
+            return Web3EthAbi.encodeParams(types, params);
+            console.log("encodeConstructorParams - Web3EthAbi");
+
         })[0] || '';
     };
 
