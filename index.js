@@ -41,7 +41,7 @@ module.exports = function (){
         var types = this.getFunctionParams(abi,methodName);
         var fullName = methodName +  '(' + types.join() + ')';
         var signature = CryptoJS.SHA3(fullName,{outputLength:256}).toString(CryptoJS.enc.Hex).slice(0, 8);
-        var dataHex = signature  + Web3EthAbi.encodeParams(...types, params);
+        var dataHex = signature  + Web3EthAbi.encodeParameters(...types, params);
         console.log("encodeFunctionParams - Web3EthAbi");
 
         var payload = '0x'+dataHex;
@@ -67,8 +67,7 @@ module.exports = function (){
                 return input.type;
             });
         }).map(function (types) {
-            // return coder.encodeParams(types, params);
-            return Web3EthAbi.encodeParams(types, params);
+            return Web3EthAbi.encodeParameters(types, params);
             console.log("encodeConstructorParams - Web3EthAbi");
 
         })[0] || '';
@@ -96,18 +95,32 @@ module.exports = function (){
         });
     }
 
-    this.invokeSendRawTransaction = function (functionName, transactionPayload){
-        return new Promise((resolve, reject) =>{
-            web3.eth.sendRawTransaction(transactionPayload, function(error, txHash) {
-                if(!error){
-                    resolve({"status":1,"functionName":functionName,"message":txHash});
-                }
-                else{
-                    reject({"status":0,"functionName":functionName,"message":error});
-                }
-            });
+
+this.invokeSendRawTransaction = function (functionName, transactionPayload){
+    return new Promise((resolve, reject) =>{
+        web3.eth.sendSignedTransaction(transactionPayload, function(error, txHash) {
+            if(!error){
+                resolve({"status":1,"functionName":functionName,"message":txHash});
+            }
+            else{
+                reject({"status":0,"functionName":functionName,"message":error});
+            }
         });
-    }
+    });
+}
+
+    // this.invokeSendRawTransaction = function (functionName, transactionPayload){
+    //     return new Promise((resolve, reject) =>{
+    //         web3.eth.sendRawTransaction(transactionPayload, function(error, txHash) {
+    //             if(!error){
+    //                 resolve({"status":1,"functionName":functionName,"message":txHash});
+    //             }
+    //             else{
+    //                 reject({"status":0,"functionName":functionName,"message":error});
+    //             }
+    //         });
+    //     });
+    // }
 
     this.prepareSignSend = function(abi,contractAddress,functionName,senderAddress,privateKey, params){
         return new Promise((resolve, reject) => {
@@ -149,22 +162,23 @@ module.exports = function (){
         };
 
         if (nonce == '')
-            nonce = web3.toHex(web3.eth.getTransactionCount(fromAddress));
+            nonce = Web3Utils.toHex(web3.eth.getTransactionCount(fromAddress));
         TxnAttributes.nonce = nonce;
 
         TxnAttributes.from = fromAddress;
         TxnAttributes.to = toAddress;
-        TxnAttributes.value = web3.toHex(Web3Utils.toWei(valueInEther, 'ether'));
+        TxnAttributes.value = Web3Utils.toHex(Web3Utils.toWei(valueInEther, 'ether'));
         TxnAttributes.data = dataAsHex;
 
         if (gasLimit == '')
             gasLimit = 4500000;
-        TxnAttributes.gasLimit = web3.toHex(gasLimit);
+        TxnAttributes.gasLimit = Web3Utils.toHex(gasLimit);
 
         if (gasPrice == '')
-            gasPrice = web3.eth.gasPrice;
-        TxnAttributes.gasPrice = web3.toHex(gasPrice);
+            gasPrice = web3.eth.getGasPrice();
+        TxnAttributes.gasPrice = Web3Utils.toHex(gasPrice);
 
+        console.log(TxnAttributes);
         return TxnAttributes;
     }
 }
