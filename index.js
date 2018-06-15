@@ -41,8 +41,7 @@ module.exports = function (){
         var types = this.getFunctionParams(abi,methodName);
         var fullName = methodName +  '(' + types.join() + ')';
         var signature = CryptoJS.SHA3(fullName,{outputLength:256}).toString(CryptoJS.enc.Hex).slice(0, 8);
-        var dataHex = signature  + Web3EthAbi.encodeParameters(...types, params);
-        console.log("encodeFunctionParams - Web3EthAbi");
+        var dataHex = signature  + Web3EthAbi.encodeParameters(...types, params).substring(2);
 
         var payload = '0x'+dataHex;
 
@@ -68,7 +67,6 @@ module.exports = function (){
             });
         }).map(function (types) {
             return Web3EthAbi.encodeParameters(types, params);
-            console.log("encodeConstructorParams - Web3EthAbi");
 
         })[0] || '';
     };
@@ -76,9 +74,10 @@ module.exports = function (){
     this.getSignedTransaction = function(txnRawData, pvtKey){
         var tx = new Tx(txnRawData);
         tx.sign(pvtKey);
-        var serializedTx = '0x'+ tx.serialize().toString('hex');
+        var serializedTx = tx.serialize();
+        var txToSend =  '0x' + serializedTx.toString('hex');
 
-        return serializedTx;
+        return txToSend;
     }
 
     this.createNewAccount =  function() {
@@ -89,47 +88,33 @@ module.exports = function (){
                 reject({"status":0,"message":"Account create failed"});
             }
             else {
-                console.log(retObj);
                 resolve({"address":retObj.address,"privateKey":retObj.privateKey});
             }
         });
     }
 
 
-this.invokeSendRawTransaction = function (functionName, transactionPayload){
-    return new Promise((resolve, reject) =>{
-        web3.eth.sendSignedTransaction(transactionPayload, function(error, txHash) {
-            if(!error){
-                resolve({"status":1,"functionName":functionName,"message":txHash});
-            }
-            else{
-                reject({"status":0,"functionName":functionName,"message":error});
-            }
+    this.invokeSendRawTransaction = function (functionName, transactionPayload){
+        return new Promise((resolve, reject) =>{
+            web3.eth.sendSignedTransaction(transactionPayload, function(error, txHash) {
+                if(!error){
+                    resolve({"status":1,"functionName":functionName,"message":txHash});
+                }
+                else{
+                    reject({"status":0,"functionName":functionName,"message":error});
+                }
+            });
         });
-    });
-}
-
-    // this.invokeSendRawTransaction = function (functionName, transactionPayload){
-    //     return new Promise((resolve, reject) =>{
-    //         web3.eth.sendRawTransaction(transactionPayload, function(error, txHash) {
-    //             if(!error){
-    //                 resolve({"status":1,"functionName":functionName,"message":txHash});
-    //             }
-    //             else{
-    //                 reject({"status":0,"functionName":functionName,"message":error});
-    //             }
-    //         });
-    //     });
-    // }
+    }
 
     this.prepareSignSend = function(abi,contractAddress,functionName,senderAddress,privateKey, params){
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
 
             var txnData = this.encodeFunctionParams(abi, functionName,  params);
-            var txnRawData = this.getDefaultTxnAttributes('',senderAddress,contractAddress,'0',txnData,'','')
-            var serializedTx = this.getSignedTransaction(txnRawData, privateKey);
+            var txnRawData = await this.getDefaultTxnAttributes('',senderAddress,contractAddress,'0',txnData,'','')
+            var dataToSend = this.getSignedTransaction(txnRawData, privateKey);
 
-            this.invokeSendRawTransaction(functionName,serializedTx).then((result) =>{
+            await this.invokeSendRawTransaction(functionName,dataToSend).then((result) =>{
                 resolve(result);
             },(error) =>{
                 reject(error);
@@ -149,7 +134,7 @@ this.invokeSendRawTransaction = function (functionName, transactionPayload){
         });
     }
 
-    this.getDefaultTxnAttributes = function (nonce,fromAddress, toAddress, valueInEther,dataAsHex, gasLimit, gasPrice){
+    this.getDefaultTxnAttributes = async function (nonce,fromAddress, toAddress, valueInEther,dataAsHex, gasLimit, gasPrice){
 
         var TxnAttributes = {
             nonce: '0x00',
@@ -161,8 +146,10 @@ this.invokeSendRawTransaction = function (functionName, transactionPayload){
             gasPrice: '0x00'
         };
 
-        if (nonce == '')
-            nonce = Web3Utils.toHex(web3.eth.getTransactionCount(fromAddress));
+        if (nonce == '') {
+            var _nonce =  await web3.eth.getTransactionCount(fromAddress);
+            nonce =   Web3Utils.toHex(_nonce);
+        }
         TxnAttributes.nonce = nonce;
 
         TxnAttributes.from = fromAddress;
@@ -171,14 +158,13 @@ this.invokeSendRawTransaction = function (functionName, transactionPayload){
         TxnAttributes.data = dataAsHex;
 
         if (gasLimit == '')
-            gasLimit = 4500000;
+            gasLimit = 750000;
         TxnAttributes.gasLimit = Web3Utils.toHex(gasLimit);
 
         if (gasPrice == '')
-            gasPrice = web3.eth.getGasPrice();
+            gasPrice = await web3.eth.getGasPrice();
         TxnAttributes.gasPrice = Web3Utils.toHex(gasPrice);
 
-        console.log(TxnAttributes);
         return TxnAttributes;
     }
 }
