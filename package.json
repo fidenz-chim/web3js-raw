@@ -1,6 +1,6 @@
 {
   "name": "web3js-raw",
-  "version": "0.0.2-beta.5",
+  "version": "0.0.2-beta.6",
   "description": "web3js wrapper to work with minimum dependencies",
   "dependencies": {
     "ethereumjs-tx": "^1.3.4",
