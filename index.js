@@ -4,9 +4,10 @@ Reusable set of functions to send transactions using sendRawTransaction of web3j
  * Copyright(c) 2018-2018 Chim Himidumage
  * MIT Licensed
 
- 2018/06/13 - Introduced promises to all Async calls
+2018/06/13  - Introduced promises to all Async calls
             - Updated all dependencies to latest versions
             - Used <new web3.eth.Contract> for contract instance creation
+2018/06/22  - Made web3.eth.getTransaction function call Async with async & await
 */
 
 'use strict'
@@ -123,8 +124,8 @@ module.exports = function (){
     }
 
     this.invokeGetTxnReceipt = function (tx_hash){
-        return new Promise((resolve, reject) => {
-            var txnInfo = web3.eth.getTransaction(tx_hash);
+        return new Promise(async (resolve, reject) => {
+            var txnInfo = await web3.eth.getTransaction(tx_hash);
             if (txnInfo === null) {
                 reject({"status":0,"message":"Transaction not found"});
             }
