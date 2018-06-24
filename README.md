@@ -20,6 +20,40 @@ or
 npm install web3js-raw --save
 ```
 
+## Use cases 0.0.2beta.7 and above##
+
+### Initialise for a given contract ###
+```
+    var W3JSR = new web3jsraw();
+    W3JSR.getWeb3(ABI, CONTRACT_ADDRESS, PROVIDER_NODE);
+
+```
+### Invoke a method __DOES NOT__ change the state of the contract ###
+```
+    W3JSRW.ContractInstance.methods.getMemberCount().call().then(function(result){
+        if(result){
+            console.log(result);
+        }
+        else{
+            retVal = {"error":"error"};
+        }
+    });
+```
+
+### Invoke a method __DOES__ change the state of the contract ###
+```
+    var functionName = 'addMember';
+    var params = [newAddress];
+    W3JSRW.prepareSignSend(ABI,_CONTRACT_ADDRESS,functionName,ETHER_ACC,ETHER_PKEY,params).then((result,error) =>{
+        console.log(result);
+    },(error) =>{
+        console.log(error);
+    });
+
+```
+
+## Use cases 0.0.1beta.* and above##
+
 ## Use cases ##
 Instantiate the package and then a contract
 ```
