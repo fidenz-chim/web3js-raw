@@ -20,7 +20,7 @@ or
 npm install web3js-raw --save
 ```
 
-## Use cases 0.0.2beta.7 and above##
+## Use cases 0.0.2beta.7 and above ##
 
 ### Initialise for a given contract ###
 ```
@@ -52,7 +52,7 @@ npm install web3js-raw --save
 
 ```
 
-## Use cases 0.0.1beta.* and above##
+## Use cases 0.0.1beta.* and above ##
 
 ## Use cases ##
 Instantiate the package and then a contract
