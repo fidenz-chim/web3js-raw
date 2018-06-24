@@ -4,10 +4,12 @@ Reusable set of functions to send transactions using sendRawTransaction of web3j
  * Copyright(c) 2018-2018 Chim Himidumage
  * MIT Licensed
 
-2018/06/13  - Introduced promises to all Async calls
+ 2018/06/13 - Introduced promises to all Async calls
             - Updated all dependencies to latest versions
             - Used <new web3.eth.Contract> for contract instance creation
 2018/06/22  - Made web3.eth.getTransaction function call Async with async & await
+
+2018/06/24  - getWeb3 now accepts ABI, Contract address and provider. Then initialise Web3 instance for the given contract
 */
 
 'use strict'
@@ -23,14 +25,15 @@ var web3 = new Web3();
 
 //Support Functions
 module.exports = function (){
-
     this.ContractInstance;
 
     this.setProvider = function (provider){
         web3.setProvider(new web3.providers.HttpProvider(provider));
     }
 
-    this.getWeb3 = function (){
+    this.getWeb3 = function (contractABI,contractAddress,provider){
+        web3.setProvider(new web3.providers.HttpProvider(provider));
+        this.ContractInstance = new web3.eth.Contract(contractABI,contractAddress);
         return web3;
     }
 
