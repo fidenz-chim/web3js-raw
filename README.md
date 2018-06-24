@@ -4,7 +4,7 @@ This uses __sendRawTransaction__ method to post transactions but encapsulate all
 
 ## Sample Dapp using web3js-raw ##
 
-Refer [Fund Splitter smart contract dapp (fundsplitter_web3jsraw)](https://github.com/fidenz-chim/fundsplitter_web3jsraw.git) for fully funcational implementation of a Dapp using web3js-raw
+Refer [Fund Splitter smart contract dapp (fs_w3jsr)](https://github.com/fidenz-chim/fs_w3r2) for fully funcational implementation of a Dapp using web3js-raw
 
 ## Prerequisite ##
 
@@ -12,7 +12,7 @@ Refer [Fund Splitter smart contract dapp (fundsplitter_web3jsraw)](https://githu
 * Account with Ether balance (to deploy the contract)
 * Private key of the account
 * Address of the contract (if you want to interact with already deployed contract)
-or
+__OR__
 * Byte code of the contract (if you want to deploy a new contract)
 
 ## Install ##
@@ -52,76 +52,15 @@ npm install web3js-raw --save
 
 ```
 
-## Use cases 0.0.1beta.* and above ##
-
-## Use cases ##
-Instantiate the package and then a contract
-```
-var _web3jsraw = require('web3js-raw');
-var W3JSR = new _web3jsraw();
-W3JSR.setProvider('https://ropsten.infura.io/{your_infura.io_token'});
-W3JSR.createContractInstance(CONTRACT_ABI,contractAddress); //Assuming the contract is already deployed to ropsten testnet
-```
-
-Define a callback function 
-```
-var web3jsrCallaback = function (data){
-    console.log("web3jsrCallaback - ", data);
-}
-
-```
-There are __THREE__ main usage scenarios to interact with a smart contract using this package,
-#### Invoke a method __DOES NOT__ change the state of the contract ####
-```
-//.sol
-    function getMemberAt(uint index) public view returns(address mem)
-```
-
-```
-//.js
-    W3JSR.ContractInstance.getMemberAt(index,function(error, result){
-        if(!error){
-            console.log("getMemberAt - ", result);
-            var str= "MemberAt - ".concat(result);
-            console.log(str);
-        }
-        else
-            console.error(error);
-    });
-```
-#### Invoke a method __DOES__ change the state of the contract ####
-```
-//.sol
-    function addMember(address newMember) payable public
-```
-
-```
-//.js
-    var functionName = 'addMember';
-    var types = ['address'];
-    var args = ['0x00002d5cc95777ed0f1dbcac9b5a30fb1868eea4'];
-
-    var txnData = W3JSR.encodeFunctionParams(functionName, types, args);
-    var txnRawData = W3JSR.getDefaultTxnAttributes('',contractOwner,CONTRACT_ADDRESS,'0',txnData,'','')
-    var serializedTx = W3JSR.getSignedTransaction(txnRawData, privateKey);
-
-    W3JSR.invokeSendRawTransaction(functionName,serializedTx,web3jsrCallaback);
-```
-
-#### Deploy a contract ####
-```
-//.js
-    var txnRawData = W3JSR.getDefaultTxnAttributes('',contractOwner,'','0',CONTRACT_CODE,'',10000000000);
-
-    var args = [];
-    var bytes = W3JSR.encodeConstructorParams(CONTRACT_ABI, args);
-    txnRawData.data += bytes;
-
-    var serializedTx = W3JSR.getSignedTransaction(txnRawData, privateKey);
-    W3JSR.invokeSendRawTransaction("DeployContract",serializedTx,web3jsrCallaback );
-```
-
 ## List of functions ##
+
+* __getWeb3R__ - initialise and create an instance of web3js-raw interact with a contract
+  * in params
+    * contractABI - ABI of the contract
+    * contractAddress - current address of the contract  
+    * provider [https://ropsten.infura.io/__token__]
+  * out params
+    * underlying [Web3](https://github.com/ethereum/web3.js/) instance
 
 * __setProvider__ - set HTTP provider 
   * in params
