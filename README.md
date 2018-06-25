@@ -4,7 +4,7 @@ This uses __sendRawTransaction__ method to post transactions but encapsulate all
 
 ## Sample Dapp using web3js-raw ##
 
-Refer [Fund Splitter smart contract dapp (fundsplitter_web3jsraw)](https://github.com/fidenz-chim/fundsplitter_web3jsraw.git) for fully funcational implementation of a Dapp using web3js-raw
+Refer [Fund Splitter smart contract dapp (fs_w3jsr)](https://github.com/fidenz-chim/fs_w3r2) for fully funcational implementation of a Dapp using web3js-raw
 
 ## Prerequisite ##
 
@@ -12,7 +12,7 @@ Refer [Fund Splitter smart contract dapp (fundsplitter_web3jsraw)](https://githu
 * Account with Ether balance (to deploy the contract)
 * Private key of the account
 * Address of the contract (if you want to interact with already deployed contract)
-or
+__OR__
 * Byte code of the contract (if you want to deploy a new contract)
 
 ## Install ##
@@ -20,76 +20,61 @@ or
 npm install web3js-raw --save
 ```
 
-## Use cases ##
-Instantiate the package and then a contract
-```
-var _web3jsraw = require('web3js-raw');
-var W3JSR = new _web3jsraw();
-W3JSR.setProvider('https://ropsten.infura.io/{your_infura.io_token'});
-W3JSR.createContractInstance(CONTRACT_ABI,contractAddress); //Assuming the contract is already deployed to ropsten testnet
-```
+## Use cases 0.0.2beta.7 and above ##
 
-Define a callback function 
+### Initialise for a given contract ###
 ```
-var web3jsrCallaback = function (data){
-    console.log("web3jsrCallaback - ", data);
-}
+    var W3JSR = new web3jsraw();
+    W3JSR.getWeb3(ABI, CONTRACT_ADDRESS, PROVIDER_NODE);
 
 ```
-There are __THREE__ main usage scenarios to interact with a smart contract using this package,
-#### Invoke a method __DOES NOT__ change the state of the contract ####
+### Invoke a method __DOES NOT__ change the state of the contract ###
 ```
-//.sol
-    function getMemberAt(uint index) public view returns(address mem)
-```
-
-```
-//.js
-    W3JSR.ContractInstance.getMemberAt(index,function(error, result){
-        if(!error){
-            console.log("getMemberAt - ", result);
-            var str= "MemberAt - ".concat(result);
-            console.log(str);
+    W3JSRW.ContractInstance.methods.getMemberCount().call().then(function(result){
+        if(result){
+            console.log(result);
         }
-        else
-            console.error(error);
+        else{
+            retVal = {"error":"error"};
+        }
     });
 ```
-#### Invoke a method __DOES__ change the state of the contract ####
-```
-//.sol
-    function addMember(address newMember) payable public
-```
 
+### Invoke a method __DOES__ change the state of the contract ###
 ```
-//.js
     var functionName = 'addMember';
-    var types = ['address'];
-    var args = ['0x00002d5cc95777ed0f1dbcac9b5a30fb1868eea4'];
+    var params = [newAddress];
+    W3JSRW.prepareSignSend(ABI,_CONTRACT_ADDRESS,functionName,ETHER_ACC,ETHER_PKEY,params).then((result,error) =>{
+        console.log(result);
+    },(error) =>{
+        console.log(error);
+    });
 
-    var txnData = W3JSR.encodeFunctionParams(functionName, types, args);
-    var txnRawData = W3JSR.getDefaultTxnAttributes('',contractOwner,CONTRACT_ADDRESS,'0',txnData,'','')
-    var serializedTx = W3JSR.getSignedTransaction(txnRawData, privateKey);
-
-    W3JSR.invokeSendRawTransaction(functionName,serializedTx,web3jsrCallaback);
-```
-
-#### Deploy a contract ####
-```
-//.js
-    var txnRawData = W3JSR.getDefaultTxnAttributes('',contractOwner,'','0',CONTRACT_CODE,'',10000000000);
-
-    var args = [];
-    var bytes = W3JSR.encodeConstructorParams(CONTRACT_ABI, args);
-    txnRawData.data += bytes;
-
-    var serializedTx = W3JSR.getSignedTransaction(txnRawData, privateKey);
-    W3JSR.invokeSendRawTransaction("DeployContract",serializedTx,web3jsrCallaback );
 ```
 
 ## List of functions ##
 
-* __setProvider__ - set HTTP provider 
+* __getWeb3R__ - initialise and create an instance of web3js-raw interact with a contract
+  * in params
+    * contractABI - ABI of the contract
+    * contractAddress - current address of the contract  
+    * provider [https://ropsten.infura.io/__token__]
+  * out params
+    * underlying [Web3](https://github.com/ethereum/web3.js/) instance
+
+* __prepareSignSend__ - Prepare and sign and send transactions to network
+  * in params
+    * contractABI - ABI of the contract
+    * contractAddress - current address of the contract  
+    * functionName - name of the function to invoke - only to use in callback function to identify the response
+    * senderAddress - address of transaction sender (must have an ether balance)
+    * privateKey - private key of transaction sender    
+    * params - data attributes of the Smart Contract function
+  * out params
+    * a Promise
+
+
+* __setProvider__ - set HTTP provider
   * in params
     * provider [https://ropsten.infura.io/__token__]
   * out params
@@ -100,7 +85,7 @@ There are __THREE__ main usage scenarios to interact with a smart contract using
     * contractAddress - current address of the contract
   * out params
     * __none__
-  
+
 * __encodeFunctionParams__ - prepare data payload of a method adding parameters
   * in params
     * functionName - Name of the function to invoke
@@ -111,7 +96,7 @@ There are __THREE__ main usage scenarios to interact with a smart contract using
 
 * __encodeConstructorParams__ - prepare data payload of constructor method adding parameters
   * in params
-    * abi - contract ABI 
+    * abi - contract ABI
     * params - array of parameter values  [8, '0x001a18EaFA0b300247Be05ECE41DE8d78c7B0620']    
   * out params
     * value for _data_ of transaction message as hex (prefixed with 0x)
@@ -136,6 +121,7 @@ There are __THREE__ main usage scenarios to interact with a smart contract using
     * transactionPayload - signed data return by _getSignedTransaction_
     * callback function which accept one parameter (JSON object)
   * out params
+    * a Promise  
     * __none__ / invoke callback function which accept one parameter (JSON object)
 
 * __invokeGetTxnReceipt__ - retreive the transaction receipt from a transaction hash
@@ -143,14 +129,15 @@ There are __THREE__ main usage scenarios to interact with a smart contract using
     * tx_hash - hash of the transaction to get receipt
     * callback function which accept one parameter (JSON object)
   * out params
+    * a Promise  
     * __none__ / invoke callback function which accept one parameter (JSON object)
 
 * __getDefaultTxnAttributes__ - get the transaction message with default values (or provide custom values)
   * in params
-    * nonce 
-    * fromAddress 
+    * nonce
+    * fromAddress
     * toAddress
-    * valueInEther 
+    * valueInEther
     * dataAsHex
     * gasLimit
     * gasPrice
@@ -166,4 +153,3 @@ There are __THREE__ main usage scenarios to interact with a smart contract using
             gasLimit: '0x00',
             gasPrice: '0x00'
         };```
-        
