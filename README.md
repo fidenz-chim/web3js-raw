@@ -69,11 +69,22 @@ npm install web3js-raw --save
     * functionName - name of the function to invoke - only to use in callback function to identify the response
     * senderAddress - address of transaction sender (must have an ether balance)
     * privateKey - private key of transaction sender    
+    * params - data attributes of the Smart Contract function 
+  * out params
+    * a Promise
+* __prepareSignSend__ - Prepare and sign and send transactions to network
+  * in params
+    * contractABI - ABI of the contract
+    * contractAddress - current address of the contract  
+    * functionName - name of the function to invoke - only to use in callback function to identify the response
+    * senderAddress - address of transaction sender (must have an ether balance)
+    * privateKey - private key of transaction sender    
     * params - data attributes of the Smart Contract function
   * out params
     * a Promise
 
 
+* __setProvider__ - set HTTP provider 
 * __setProvider__ - set HTTP provider
   * in params
     * provider [https://ropsten.infura.io/__token__]
