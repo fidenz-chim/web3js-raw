@@ -62,6 +62,18 @@ npm install web3js-raw --save
   * out params
     * underlying [Web3](https://github.com/ethereum/web3.js/) instance
 
+* __prepareSignSend__ - Prepare and sign and send transactions to network
+  * in params
+    * contractABI - ABI of the contract
+    * contractAddress - current address of the contract  
+    * functionName - name of the function to invoke - only to use in callback function to identify the response
+    * senderAddress - address of transaction sender (must have an ether balance)
+    * privateKey - private key of transaction sender    
+    * params - data attributes of the Smart Contract function 
+  * out params
+    * a Promise
+
+
 * __setProvider__ - set HTTP provider 
   * in params
     * provider [https://ropsten.infura.io/__token__]
@@ -109,6 +121,7 @@ npm install web3js-raw --save
     * transactionPayload - signed data return by _getSignedTransaction_
     * callback function which accept one parameter (JSON object)
   * out params
+    * a Promise  
     * __none__ / invoke callback function which accept one parameter (JSON object)
 
 * __invokeGetTxnReceipt__ - retreive the transaction receipt from a transaction hash
@@ -116,6 +129,7 @@ npm install web3js-raw --save
     * tx_hash - hash of the transaction to get receipt
     * callback function which accept one parameter (JSON object)
   * out params
+    * a Promise  
     * __none__ / invoke callback function which accept one parameter (JSON object)
 
 * __getDefaultTxnAttributes__ - get the transaction message with default values (or provide custom values)
