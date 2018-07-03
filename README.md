@@ -70,6 +70,7 @@ npm install web3js-raw --save
     * senderAddress - address of transaction sender (must have an ether balance)
     * privateKey - private key of transaction sender    
     * params - data attributes of the Smart Contract function 
+    * gasLimit - gas limit for the transaction
   * out params
     * a Promise
 * __prepareSignSend__ - Prepare and sign and send transactions to network
