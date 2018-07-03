@@ -44,7 +44,7 @@ npm install web3js-raw --save
 ```
     var functionName = 'addMember';
     var params = [newAddress];
-    W3JSRW.prepareSignSend(ABI,_CONTRACT_ADDRESS,functionName,ETHER_ACC,ETHER_PKEY,params).then((result,error) =>{
+    W3JSRW.prepareSignSend(ABI,_CONTRACT_ADDRESS,functionName,ETHER_ACC,ETHER_PKEY,params,gasLimit).then((result,error) =>{
         console.log(result);
     },(error) =>{
         console.log(error);
