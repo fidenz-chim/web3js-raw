@@ -10,6 +10,9 @@ Reusable set of functions to send transactions using sendRawTransaction of web3j
 2018/06/22  - Made web3.eth.getTransaction function call Async with async & await
 
 2018/06/24  - getWeb3 now accepts ABI, Contract address and provider. Then initialise Web3 instance for the given contract
+
+2018/07/03  - Introduced gasEstimate function to find the exact gas requirment
+            - Included gasLimit parameter to prepareSignSend, so the gasLimit can be set from the caller
 */
 
 'use strict'
@@ -31,9 +34,9 @@ module.exports = function (){
         web3.setProvider(new web3.providers.HttpProvider(provider));
     }
 
-    this.getWeb3 = function (contractABI,contractAddress,provider){
+    this.getWeb3 = async function (contractABI,contractAddress,provider){
         web3.setProvider(new web3.providers.HttpProvider(provider));
-        this.ContractInstance = new web3.eth.Contract(contractABI,contractAddress);
+        this.ContractInstance = await new web3.eth.Contract(contractABI,contractAddress);
         return web3;
     }
 
@@ -97,7 +100,6 @@ module.exports = function (){
         });
     }
 
-
     this.invokeSendRawTransaction = function (functionName, transactionPayload){
         return new Promise((resolve, reject) =>{
             web3.eth.sendSignedTransaction(transactionPayload, function(error, txHash) {
@@ -111,11 +113,12 @@ module.exports = function (){
         });
     }
 
-    this.prepareSignSend = function(abi,contractAddress,functionName,senderAddress,privateKey, params){
+    this.prepareSignSend = function(abi,contractAddress,functionName,senderAddress,privateKey, params, gasLimit){
         return new Promise(async (resolve, reject) => {
 
             var txnData = this.encodeFunctionParams(abi, functionName,  params);
-            var txnRawData = await this.getDefaultTxnAttributes('',senderAddress,contractAddress,'0',txnData,'','')
+            var _gasLimit = await this.ContractInstance.methods[functionName](...params).estimateGas({'from': senderAddress, 'gas': gasLimit});
+            var txnRawData = await this.getDefaultTxnAttributes('',senderAddress,contractAddress,'0',txnData,_gasLimit,'')
             var dataToSend = this.getSignedTransaction(txnRawData, privateKey);
 
             await this.invokeSendRawTransaction(functionName,dataToSend).then((result) =>{
@@ -169,6 +172,7 @@ module.exports = function (){
             gasPrice = await web3.eth.getGasPrice();
         TxnAttributes.gasPrice = Web3Utils.toHex(gasPrice);
 
+        console.log("TxnAttributes",TxnAttributes);
         return TxnAttributes;
     }
 }
