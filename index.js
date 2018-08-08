@@ -13,6 +13,9 @@ Reusable set of functions to send transactions using sendRawTransaction of web3j
 
 2018/07/03  - Introduced gasEstimate function to find the exact gas requirment
             - Included gasLimit parameter to prepareSignSend, so the gasLimit can be set from the caller
+
+2018/08/08  - Ability to get web3 instance wihtout binding to a contract (getWeb3Base)
+
 */
 
 'use strict'
@@ -37,6 +40,11 @@ module.exports = function (){
     this.getWeb3 = async function (contractABI,contractAddress,provider){
         web3.setProvider(new web3.providers.HttpProvider(provider));
         this.ContractInstance = await new web3.eth.Contract(contractABI,contractAddress);
+        return web3;
+    }
+
+    this.getWeb3Base = function (provider){
+        web3.setProvider(new web3.providers.HttpProvider(provider));
         return web3;
     }
 
