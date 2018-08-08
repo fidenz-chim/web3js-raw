@@ -52,15 +52,34 @@ npm install web3js-raw --save
 
 ```
 
+### Initialise multiple contracts ###
+```
+    var W3JSR_A = new web3jsraw();
+    var contractInstance_A = W3JSR_A.getWeb3(ABI_A, CONTRACT_ADDRESS_A, PROVIDER_NODE);
+
+    var W3JSR_B = new web3jsraw();
+    var contractInstance_B = W3JSR_B.getWeb3(ABI_B, CONTRACT_ADDRESS_B, PROVIDER_NODE);
+    
+    //contractInstance_A & contractInstance_B are two independent objects which represent 2 contracts
+
+```
+
 ## List of functions ##
 
-* __getWeb3R__ - initialise and create an instance of web3js-raw interact with a contract
+* __getWeb3__ - initialise and create an instance of web3js-raw interact with a contract
   * in params
     * contractABI - ABI of the contract
     * contractAddress - current address of the contract  
     * provider [https://ropsten.infura.io/__token__]
   * out params
     * underlying [Web3](https://github.com/ethereum/web3.js/) instance
+
+* __getWeb3Base__ - initialise and create an instance of web3 (without binding to a contract)
+  * in params
+    * provider [https://ropsten.infura.io/__token__]
+  * out params
+    * underlying [Web3](https://github.com/ethereum/web3.js/) instance
+
 
 * __prepareSignSend__ - Prepare and sign and send transactions to network
   * in params
