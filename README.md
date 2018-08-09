@@ -92,19 +92,7 @@ npm install web3js-raw --save
     * gasLimit - gas limit for the transaction
   * out params
     * a Promise
-* __prepareSignSend__ - Prepare and sign and send transactions to network
-  * in params
-    * contractABI - ABI of the contract
-    * contractAddress - current address of the contract  
-    * functionName - name of the function to invoke - only to use in callback function to identify the response
-    * senderAddress - address of transaction sender (must have an ether balance)
-    * privateKey - private key of transaction sender    
-    * params - data attributes of the Smart Contract function
-  * out params
-    * a Promise
 
-
-* __setProvider__ - set HTTP provider 
 * __setProvider__ - set HTTP provider
   * in params
     * provider [https://ropsten.infura.io/__token__]
@@ -145,15 +133,6 @@ npm install web3js-raw --save
   * out params
     * address - newly created account address
     * privateKey - private key of newly created account
-
-* __invokeSendRawTransaction__ - send the signed transaction to network
-  * in params
-    * functionName - name of the function to invoke - only to use in callback function to identify the response
-    * transactionPayload - signed data return by _getSignedTransaction_
-    * callback function which accept one parameter (JSON object)
-  * out params
-    * a Promise  
-    * __none__ / invoke callback function which accept one parameter (JSON object)
 
 * __invokeGetTxnReceipt__ - retreive the transaction receipt from a transaction hash
   * in params
