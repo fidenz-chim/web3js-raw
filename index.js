@@ -1,10 +1,10 @@
-/*
+/*******************************************************************************
 web3js-raw
 Reusable set of functions to send transactions using sendRawTransaction of web3js
  * Copyright(c) 2018-2018 Chim Himidumage
  * MIT Licensed
 
- 2018/06/13 - Introduced promises to all Async calls
+2018/06/13  - Introduced promises to all Async calls
             - Updated all dependencies to latest versions
             - Used <new web3.eth.Contract> for contract instance creation
 2018/06/22  - Made web3.eth.getTransaction function call Async with async & await
@@ -16,7 +16,10 @@ Reusable set of functions to send transactions using sendRawTransaction of web3j
 
 2018/08/08  - Ability to get web3 instance wihtout binding to a contract (getWeb3Base)
 
-*/
+2018/08/09  - Introduce error handling, updated try-catch on getWeb3, prepareSignSend, invokeGetTxnReceipt, getDefaultTxnAttributes
+            - Removed invokeSendRawTransaction, and included the web3.eth.sendSignedTransaction inside prepareSignSend itself
+
+********************************************************************************/
 
 'use strict'
 
@@ -38,9 +41,14 @@ module.exports = function (){
     }
 
     this.getWeb3 = async function (contractABI,contractAddress,provider){
-        web3.setProvider(new web3.providers.HttpProvider(provider));
-        this.ContractInstance = await new web3.eth.Contract(contractABI,contractAddress);
-        return web3;
+        try{
+            web3.setProvider(new web3.providers.HttpProvider(provider));
+            this.ContractInstance = await new web3.eth.Contract(contractABI,contractAddress);
+            return web3;
+        }
+        catch (err){
+            return null;
+        }
     }
 
     this.getWeb3Base = function (provider){
@@ -108,6 +116,8 @@ module.exports = function (){
         });
     }
 
+
+//Can depricate
     this.invokeSendRawTransaction = function (functionName, transactionPayload){
         return new Promise((resolve, reject) =>{
             web3.eth.sendSignedTransaction(transactionPayload, function(error, txHash) {
@@ -123,28 +133,44 @@ module.exports = function (){
 
     this.prepareSignSend = function(abi,contractAddress,functionName,senderAddress,privateKey, params, gasLimit){
         return new Promise(async (resolve, reject) => {
-
-            var txnData = this.encodeFunctionParams(abi, functionName,  params);
-            var _gasLimit = await this.ContractInstance.methods[functionName](...params).estimateGas({'from': senderAddress, 'gas': gasLimit});
-            var txnRawData = await this.getDefaultTxnAttributes('',senderAddress,contractAddress,'0',txnData,_gasLimit,'')
-            var dataToSend = this.getSignedTransaction(txnRawData, privateKey);
-
-            await this.invokeSendRawTransaction(functionName,dataToSend).then((result) =>{
-                resolve(result);
-            },(error) =>{
-                reject(error);
-            });
+            try{
+                var txnData = this.encodeFunctionParams(abi, functionName,  params);
+                var _gasLimit = await this.ContractInstance.methods[functionName](...params).estimateGas({'from': senderAddress, 'gas': gasLimit});
+                var txnRawData = await this.getDefaultTxnAttributes('',senderAddress,contractAddress,'0',txnData,_gasLimit,'')
+                if (txnRawData) {
+                    var dataToSend = this.getSignedTransaction(txnRawData, privateKey);
+                    web3.eth.sendSignedTransaction(dataToSend, function(error, txHash) {
+                        if(!error){
+                            resolve({"status":1,"functionName":functionName,"message":txHash});
+                        }
+                        else{
+                            reject({"status":0,"functionName":functionName,"message":error});
+                        }
+                    });
+                }
+                else{
+                    reject({"status":0,"functionName":functionName,"message":"Error in setting Default Txn Attributes"});
+                }
+            }
+            catch (err){
+                reject({"status":0,"functionName":functionName,"message":err});
+            }
         });
     }
 
     this.invokeGetTxnReceipt = function (tx_hash){
         return new Promise(async (resolve, reject) => {
-            var txnInfo = await web3.eth.getTransaction(tx_hash);
-            if (txnInfo === null) {
-                reject({"status":0,"message":"Transaction not found"});
+            try{
+                var txnInfo = await web3.eth.getTransaction(tx_hash);
+                if (txnInfo === null) {
+                    reject({"status":0,"message":"Transaction not found"});
+                }
+                else {
+                    resolve({"status":1,"message":txnInfo});
+                }
             }
-            else {
-                resolve({"status":1,"message":txnInfo});
+            catch (err){
+                reject({"status":0,"message":err});
             }
         });
     }
@@ -160,27 +186,32 @@ module.exports = function (){
             gasLimit: '0x00',
             gasPrice: '0x00'
         };
+        try{
+            if (nonce == '') {
+                var _nonce =  await web3.eth.getTransactionCount(fromAddress);
+                nonce =   Web3Utils.toHex(_nonce);
+            }
+            TxnAttributes.nonce = nonce;
 
-        if (nonce == '') {
-            var _nonce =  await web3.eth.getTransactionCount(fromAddress);
-            nonce =   Web3Utils.toHex(_nonce);
+            TxnAttributes.from = fromAddress;
+            TxnAttributes.to = toAddress;
+            TxnAttributes.value = Web3Utils.toHex(Web3Utils.toWei(valueInEther, 'ether'));
+            TxnAttributes.data = dataAsHex;
+
+            if (gasLimit == '')
+                gasLimit = 750000;
+            TxnAttributes.gasLimit = Web3Utils.toHex(gasLimit);
+
+            if (gasPrice == '')
+                gasPrice = await web3.eth.getGasPrice();
+            TxnAttributes.gasPrice = Web3Utils.toHex(gasPrice);
+
+            console.log("TxnAttributes",TxnAttributes);
+            return TxnAttributes;
         }
-        TxnAttributes.nonce = nonce;
-
-        TxnAttributes.from = fromAddress;
-        TxnAttributes.to = toAddress;
-        TxnAttributes.value = Web3Utils.toHex(Web3Utils.toWei(valueInEther, 'ether'));
-        TxnAttributes.data = dataAsHex;
-
-        if (gasLimit == '')
-            gasLimit = 750000;
-        TxnAttributes.gasLimit = Web3Utils.toHex(gasLimit);
-
-        if (gasPrice == '')
-            gasPrice = await web3.eth.getGasPrice();
-        TxnAttributes.gasPrice = Web3Utils.toHex(gasPrice);
-
-        console.log("TxnAttributes",TxnAttributes);
-        return TxnAttributes;
+        catch (err)
+        {
+            return null;
+        }
     }
 }
