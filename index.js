@@ -19,6 +19,8 @@ Reusable set of functions to send transactions using sendRawTransaction of web3j
 2018/08/09  - Introduce error handling, updated try-catch on getWeb3, prepareSignSend, invokeGetTxnReceipt, getDefaultTxnAttributes
             - Removed invokeSendRawTransaction, and included the web3.eth.sendSignedTransaction inside prepareSignSend itself
 
+2018/08/10  - Removed the Promise around sendSignedTransaction as  __prepareSignSend__ is already an async function
+
 ********************************************************************************/
 
 'use strict'
@@ -115,47 +117,23 @@ module.exports = function (){
             }
         });
     }
-
-
-//Can depricate
-    this.invokeSendRawTransaction = function (functionName, transactionPayload){
-        return new Promise((resolve, reject) =>{
-            web3.eth.sendSignedTransaction(transactionPayload, function(error, txHash) {
-                if(!error){
-                    resolve({"status":1,"functionName":functionName,"message":txHash});
-                }
-                else{
-                    reject({"status":0,"functionName":functionName,"message":error});
-                }
-            });
-        });
-    }
-
-    this.prepareSignSend = function(abi,contractAddress,functionName,senderAddress,privateKey, params, gasLimit){
-        return new Promise(async (resolve, reject) => {
-            try{
-                var txnData = this.encodeFunctionParams(abi, functionName,  params);
-                var _gasLimit = await this.ContractInstance.methods[functionName](...params).estimateGas({'from': senderAddress, 'gas': gasLimit});
-                var txnRawData = await this.getDefaultTxnAttributes('',senderAddress,contractAddress,'0',txnData,_gasLimit,'')
-                if (txnRawData) {
-                    var dataToSend = this.getSignedTransaction(txnRawData, privateKey);
-                    web3.eth.sendSignedTransaction(dataToSend, function(error, txHash) {
-                        if(!error){
-                            resolve({"status":1,"functionName":functionName,"message":txHash});
-                        }
-                        else{
-                            reject({"status":0,"functionName":functionName,"message":error});
-                        }
-                    });
-                }
-                else{
-                    reject({"status":0,"functionName":functionName,"message":"Error in setting Default Txn Attributes"});
-                }
+    this.prepareSignSend = async function(abi,contractAddress,functionName,senderAddress,privateKey, params, gasLimit){
+        try{
+            var txnData = this.encodeFunctionParams(abi, functionName,  params);
+            var _gasLimit = await this.ContractInstance.methods[functionName](...params).estimateGas({'from': senderAddress, 'gas': gasLimit});
+            var txnRawData = await this.getDefaultTxnAttributes('',senderAddress,contractAddress,'0',txnData,_gasLimit,'')
+            if (txnRawData) {
+                var dataToSend = this.getSignedTransaction(txnRawData, privateKey);
+                var txHash = await web3.eth.sendSignedTransaction(dataToSend);
+                return Promise.resolve({"status":1,"functionName":functionName,"message":txHash});
             }
-            catch (err){
-                reject({"status":0,"functionName":functionName,"message":err});
+            else{
+                return Promise.reject({"status":0,"functionName":functionName,"message":"Error in setting Default Txn Attributes"});
             }
-        });
+        }
+        catch (err){
+            return Promise.reject({"status":0,"functionName":functionName,"message":err});
+        }
     }
 
     this.invokeGetTxnReceipt = function (tx_hash){
