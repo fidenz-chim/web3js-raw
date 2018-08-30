@@ -54,8 +54,13 @@ module.exports = function (){
     }
 
     this.getWeb3Base = function (provider){
-        web3.setProvider(new web3.providers.HttpProvider(provider));
-        return web3;
+        if(!provider) {
+          return web3;
+        }
+        else {
+          web3.setProvider(new web3.providers.HttpProvider(provider));
+          return web3;
+        }
     }
 
     this.createContractInstance = function (contractABI,contractAddress){
