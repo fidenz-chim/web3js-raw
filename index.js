@@ -27,30 +27,27 @@ Reusable set of functions to send transactions using sendRawTransaction of web3j
 
 const { Web3 } = require("web3"); // https://www.npmjs.com/package/web3
 var Web3Utils = require("web3-utils");
-var Web3EthAccounts = require("web3-eth-accounts");
 var { LegacyTransaction } = require("@ethereumjs/tx");
 
 var Web3EthAbi = require("web3-eth-abi");
 var CryptoJS = require("crypto-js");
 
-var web3 = new Web3();
-
 //Support Functions
-module.exports = function () {
+module.exports = function (provider) {
   this.ContractInstance;
+  this.web3 = new Web3(provider);
 
   this.setProvider = function (provider) {
-    web3.setProvider(new web3.providers.HttpProvider(provider));
+    this.web3.setProvider(new this.web3.providers.HttpProvider(provider));
   };
 
-  this.getWeb3 = async function (contractABI, contractAddress, provider) {
+  this.getWeb3 = async function (contractABI, contractAddress) {
     try {
-      web3.setProvider(new web3.providers.HttpProvider(provider));
-      this.ContractInstance = await new web3.eth.Contract(
+      this.ContractInstance = await new this.web3.eth.Contract(
         contractABI,
         contractAddress
       );
-      return web3;
+      return this.web3;
     } catch (err) {
       console.log("Error in getWeb3", err);
       return null;
@@ -59,15 +56,18 @@ module.exports = function () {
 
   this.getWeb3Base = function (provider) {
     if (!provider) {
-      return web3;
+      return this.web3;
     } else {
-      web3.setProvider(new web3.providers.HttpProvider(provider));
-      return web3;
+      this.web3.setProvider(new this.web3.providers.HttpProvider(provider));
+      return this.web3;
     }
   };
 
   this.createContractInstance = function (contractABI, contractAddress) {
-    this.ContractInstance = new web3.eth.Contract(contractABI, contractAddress);
+    this.ContractInstance = new this.web3.eth.Contract(
+      contractABI,
+      contractAddress
+    );
   };
 
   this.encodeFunctionParams = function (abi, methodName, params) {
@@ -124,9 +124,9 @@ module.exports = function () {
     return txToSend;
   };
 
-  this.createNewAccount = function () {
+  this.createNewAccount = function (web3 = this.web3) {
     return new Promise(function (resolve, reject) {
-      var accounts = new Web3EthAccounts();
+      var accounts = web3.eth.accounts;
       var retObj = accounts.create();
       if (retObj === null) {
         reject({ status: 0, message: "Account create failed" });
@@ -160,11 +160,11 @@ module.exports = function () {
         ""
       );
       if (txnRawData) {
-        var dataToSend = await web3.eth.accounts.signTransaction(
+        var dataToSend = await this.web3.eth.accounts.signTransaction(
           txnRawData,
           privateKey
         );
-        var txHash = await web3.eth.sendSignedTransaction(
+        var txHash = await this.web3.eth.sendSignedTransaction(
           dataToSend.rawTransaction
         );
         return Promise.resolve({
@@ -188,7 +188,7 @@ module.exports = function () {
     }
   };
 
-  this.invokeGetTxnReceipt = function (tx_hash) {
+  this.invokeGetTxnReceipt = function (tx_hash, web3 = this.web3) {
     return new Promise(async (resolve, reject) => {
       try {
         var txnInfo = await web3.eth.getTransaction(tx_hash);
@@ -222,22 +222,18 @@ module.exports = function () {
     };
     try {
       if (nonce == "") {
-        nonce = await web3.eth.getTransactionCount(fromAddress, "latest");
-        // nonce = Web3Utils.toHex(_nonce);
+        nonce = await this.web3.eth.getTransactionCount(fromAddress, "latest");
       }
       TxnAttributes.nonce = nonce;
 
       TxnAttributes.to = toAddress;
-      // TxnAttributes.value = Web3Utils.toHex(
-      //   Web3Utils.toWei(valueInEther, "ether")
-      // );
       TxnAttributes.value = valueInWei;
       TxnAttributes.data = dataAsHex;
 
       if (gasLimit == "") gasLimit = 750000;
       TxnAttributes.gasLimit = Web3Utils.toHex(gasLimit);
 
-      if (gasPrice == "") gasPrice = await web3.eth.getGasPrice();
+      if (gasPrice == "") gasPrice = await this.web3.eth.getGasPrice();
       TxnAttributes.gasPrice = Web3Utils.toHex(gasPrice);
 
       return TxnAttributes;

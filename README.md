@@ -27,8 +27,8 @@ npm install web3js-raw --save
 ### Initialise for a given contract
 
 ```
-    var W3JSR = new web3jsraw();
-    W3JSR.getWeb3(ABI, CONTRACT_ADDRESS, PROVIDER_NODE);
+    var W3JSR = new web3jsraw(PROVIDER_NODE);
+    W3JSR.getWeb3(ABI, CONTRACT_ADDRESS);
 
 ```
 
@@ -61,11 +61,11 @@ npm install web3js-raw --save
 ### Initialise multiple contracts
 
 ```
-    var W3JSR_A = new web3jsraw();
-    var contractInstance_A = W3JSR_A.getWeb3(ABI_A, CONTRACT_ADDRESS_A, PROVIDER_NODE);
+    var W3JSR_A = new web3jsraw(PROVIDER_NODE);
+    var contractInstance_A = W3JSR_A.getWeb3(ABI_A, CONTRACT_ADDRESS_A);
 
-    var W3JSR_B = new web3jsraw();
-    var contractInstance_B = W3JSR_B.getWeb3(ABI_B, CONTRACT_ADDRESS_B, PROVIDER_NODE);
+    var W3JSR_B = new web3jsraw(PROVIDER_NODE);
+    var contractInstance_B = W3JSR_B.getWeb3(ABI_B, CONTRACT_ADDRESS_B);
 
     //contractInstance_A & contractInstance_B are two independent objects which represent 2 contracts
 
@@ -78,7 +78,6 @@ npm install web3js-raw --save
   - in params
     - contractABI - ABI of the contract
     - contractAddress - current address of the contract
-    - provider [https://ropsten.infura.io/__token__]
   - out params
     - underlying [Web3](https://github.com/ethereum/web3.js/) instance
 
@@ -172,7 +171,6 @@ npm install web3js-raw --save
     ````
             var TxnAttributes = {
             nonce: '0x00',
-            from: '0x00',
             to: '0x00',
             value: '0x00',
             data: '0x00',
