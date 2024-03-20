@@ -141,7 +141,7 @@ module.exports = function () {
     functionName,
     senderAddress,
     privateKey,
-    valueInWei,
+    valueInWei = "0x00",
     params,
     gasLimit
   ) {
